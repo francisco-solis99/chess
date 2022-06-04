@@ -5,3 +5,9 @@
 body {
   background-color: #223;
 }
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

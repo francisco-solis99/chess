@@ -1,9 +1,12 @@
 import "./ChessCell.js";
+import "./ChessPiece.js";
+import initialLocations from "../data/initialLocations.json";
 
 class ChessBoard extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: "open" });
+    this.PIECES = [];
   }
 
   static get styles() {
@@ -18,6 +21,36 @@ class ChessBoard extends HTMLElement {
       --frame-color: #62351f;
       --border-style: 0;
       font-family: sans-serif;
+     }
+
+     :host(.wood) {
+      --color-odd: #eed2aa;
+      --color-even: #90502f;
+      --frame-color: #62351f;
+     }
+
+     :host(.colorful) {
+      --color-odd: #7135a4;
+      --color-even: #f566e8;
+      --frame-color: #421768;
+     }
+
+     :host(.forest) {
+      --color-odd: #779556;
+      --color-even: #ebecd0;
+      --frame-color: #3d5226;
+     }
+
+     :host(.classic) {
+      --color-odd: #e7e6e4;
+      --color-even: #ebecd0;
+      --frame-color: #779556;
+     }
+
+     :host(.ocean) {
+      --color-odd: #99ccff;
+      --color-even: #026498;
+      --frame-color: #09364e;
      }
 
      .frame {
@@ -75,8 +108,10 @@ class ChessBoard extends HTMLElement {
 
   connectedCallback() {
     this.render();
+    // this.classList.add("wood");
   }
 
+  // render funtions
   renderCells() {
     const cells = [];
     // genarete the 64 cells for the ches
@@ -90,18 +125,63 @@ class ChessBoard extends HTMLElement {
   }
 
   renderCell(y, x) {
-    console.log("render cell");
     const col = String.fromCharCode(65 + x); // 65 before the letter A in the ascii table
     const row = 9 - (y + 1);
-    console.log(col, row);
     return `
       <chess-cell x="${col}" y="${row}"></chess-cell>
     `;
   }
 
   genFakeCells(n) {
-    const texts = (n === 10 ? " ABCDEFGH " : "12345678").split("");
-    return /* html */ texts.map(text => `<div class="fake">${text}</div>`).join("");
+    const texts = (n === 10 ? " ABCDEFGH " : "87654321").split("");
+    return texts.map(text => /* html */`<div class="fake">${text}</div>`).join("");
+  }
+
+  // functions to render pieces
+  getCell(posX, posY) {
+    return this.shadowRoot.querySelector(`[x="${posX.toUpperCase()}"][y="${posY}"]`).shadowRoot.querySelector(".cell");
+  }
+
+  preparePieces() {
+    initialLocations.forEach(([letter, position]) => this.addPiece(letter, position));
+  }
+
+  getPiece(position) {
+    if (!this.isEmpty(position)) {
+      const cell = this.at(position);
+      return cell.querySelector("chess-piece");
+    }
+  }
+
+  addPiece(letter, position) {
+    const [x, y] = position;
+    const cell = this.getCell(x, y);
+    const piece = document.createElement("chess-piece");
+    piece.setAttribute("type", letter);
+    cell.appendChild(piece);
+
+    // save the each piece
+    this.PIECES.push(piece);
+  }
+
+  // functions for move the pieces
+
+  // chess-cell
+  at(position) {
+    const [x, y] = position;
+    this.getCell(x, y);
+  }
+
+  // validate if sone position is empty
+  isEmpty(position) {
+    const cell = this.at(position);
+    const piece = cell.querySelector("chess-piece");
+    return !piece;
+  }
+
+  // move some piece
+  movePiece(from, to) {
+
   }
 
   render() {

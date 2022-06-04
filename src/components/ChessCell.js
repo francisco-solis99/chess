@@ -21,6 +21,10 @@ class ChessCell extends HTMLElement {
    `;
   }
 
+  get id() {
+    return this.x + this.y;
+  }
+
   connectedCallback() {
     this.x = this.getAttribute("x");
     this.y = this.getAttribute("y");
